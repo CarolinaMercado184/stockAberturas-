@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agregar Abertura</title>
+</head>
+<body>
+    <h1>Agregar Abertura</h1>
+    <form method="POST">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" required>
+        <button type="submit">Agregar</button>
+    </form>
+</body>
+</html>
