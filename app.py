@@ -78,8 +78,7 @@ def dashboard():
     cursor.execute("SELECT * FROM stock")
     datos = cursor.fetchall()
     conn.close()
-    return render_template('dashboard.html', stock=datos, user=session['username'])from flask import Flask, render_template, request, redirect, url_for
-
+    return render_template('dashboard.html', stock=datos, user=session['username'])
 app = Flask(_name_)
 
 @app.route('/agregar', methods=['GET', 'POST'])
