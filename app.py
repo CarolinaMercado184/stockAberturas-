@@ -79,7 +79,3 @@ def dashboard():
     datos = cursor.fetchall()
     conn.close()
     return render_template('dashboard.html', stock=datos, user=session['username'])
-
-# (Agrega las otras rutas que uses, por ejemplo, para agregar stock, sumar, restar, etc.)
-
-# No es necesario el bloque if _name_ == '_main_' cuando se usa gunicorn
