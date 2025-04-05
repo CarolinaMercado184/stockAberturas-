@@ -78,4 +78,16 @@ def dashboard():
     cursor.execute("SELECT * FROM stock")
     datos = cursor.fetchall()
     conn.close()
-    return render_template('dashboard.html', stock=datos, user=session['username'])
+    return render_template('dashboard.html', stock=datos, user=session['username'])from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(_name_)
+
+@app.route('/agregar', methods=['GET', 'POST'])
+def agregar():
+    if request.method == 'POST':
+        # Aquí va la lógica para agregar una abertura al stock
+        return redirect(url_for('index'))  # Cambia 'index' si usas otra ruta principal
+    return render_template('agregar.html')  # Asegúrate de que el archivo existe
+
+if _name_ == '_main_':
+    app.run(debug=True)
