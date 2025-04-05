@@ -88,5 +88,5 @@ def agregar():
         return redirect(url_for('index'))  # Cambia 'index' si usas otra ruta principal
     return render_template('agregar.html')  # Asegúrate de que el archivo existe
 
-if _name_ == '_main_':
+if __name__ =='_main_':
     app.run(debug=True)
