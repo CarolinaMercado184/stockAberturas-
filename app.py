@@ -79,7 +79,7 @@ def dashboard():
     datos = cursor.fetchall()
     conn.close()
     return render_template('dashboard.html', stock=datos, user=session['username'])
-app = Flask(_name_)
+app = Flask(__name__)
 
 @app.route('/agregar', methods=['GET', 'POST'])
 def agregar():
