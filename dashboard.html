@@ -14,7 +14,14 @@
         <div class="col"><input class="form-control" type="text" name="medida" placeholder="Medida" required></div>
         <div class="col"><input class="form-control" type="text" name="material" placeholder="Material" required></div>
         <div class="col"><input class="form-control" type="number" name="cantidad" placeholder="Cantidad" required></div>
-        <div class="col"><button class="btn btn-success">Agregar</button></div>
+       <div class="col">
+  <select class="form-control" name="ubicacion_id" required>
+    <option value="">Seleccionar ubicación</option>
+    <option value="1">BYG</option>
+    <option value="2">LA ECONÓMICA</option>
+    <option value="3">GALPÓN</option>
+  </select>
+</div> <div class="col"><button class="btn btn-success">Agregar</button></div>
     </form>
 
     <h4>Stock Actual</h4>
