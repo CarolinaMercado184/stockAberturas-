@@ -93,7 +93,7 @@ def dashboard():
     stock = cursor.fetchall()
     conn.close()
 
-    return render_template('dashboard.html', stock=stock)
+    return render_template('dashboard.html', stock=stock, ubicacion_actual=ubicacion_seleccionada)
     if user and check_password_hash(user[2], password):
         session['username'] = user[1]
         session['role'] = user[3]
