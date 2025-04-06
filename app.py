@@ -22,7 +22,18 @@ def init_db():
             role TEXT
         )
     ''')
+# Crear tabla de ubicaciones
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS ubicaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT UNIQUE
+        )
+    ''')
 
+    # Insertar sucursales y galpón si no existen
+    cursor.execute("INSERT OR IGNORE INTO ubicaciones (id, nombre) VALUES (1, 'BYG')")
+    cursor.execute("INSERT OR IGNORE INTO ubicaciones (id, nombre) VALUES (2, 'LA ECONÓMICA')")
+    cursor.execute("INSERT OR IGNORE INTO ubicaciones (id, nombre) VALUES (3, 'GALPÓN')")
     # Crear tabla de stock
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS stock (
@@ -32,6 +43,7 @@ def init_db():
             material TEXT,
             cantidad INTEGER,
             usuario TEXT
+            ubicacion_id INTEGER
         )
     ''')
 
