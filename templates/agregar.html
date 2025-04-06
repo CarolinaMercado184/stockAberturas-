@@ -3,34 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Agregar Producto</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-    <h1>Agregar producto</h1>
-
-    <form action="/agregar" method="post">
-        <label for="codigo">Código:</label>
-        <input type="text" name="codigo" required><br>
-
-        <label for="descripcion">Descripción:</label>
-        <input type="text" name="descripcion" required><br>
-
-        <label for="color">Color:</label>
-        <input type="text" name="color" required><br>
-
-        <label for="cantidad">Cantidad:</label>
-        <input type="number" name="cantidad" required><br>
-
-        <label for="ubicacion">Ubicación:</label>
-        <select name="ubicacion" required>
-            <option value="BYG">BYG</option>
-            <option value="LA ECONÓMICA">LA ECONÓMICA</option>
-            <option value="GALPÓN">GALPÓN</option>
-        </select><br>
-
-        <button type="submit">Agregar</button>
+<body class="p-4">
+    <h1>Agregar Producto</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="producto" class="form-label">Producto</label>
+            <input type="text" class="form-control" id="producto" name="producto" required>
+        </div>
+        <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría</label>
+            <input type="text" class="form-control" id="categoria" name="categoria" required>
+        </div>
+        <div class="mb-3">
+            <label for="ubicacion" class="form-label">Ubicación</label>
+            <select class="form-select" id="ubicacion" name="ubicacion" required>
+                <option value="BYG">BYG</option>
+                <option value="LA ECONÓMICA">LA ECONÓMICA</option>
+                <option value="GALPÓN">GALPÓN</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad</label>
+            <input type="number" class="form-control" id="cantidad" name="cantidad" required>
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Volver</a>
     </form>
-
-    <br>
-    <a href="/dashboard">Volver al dashboard</a>
 </body>
 </html>
