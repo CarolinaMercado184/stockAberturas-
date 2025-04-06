@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(_name_)
 app.secret_key = 'clave_secreta_para_sesiones'
 
-# Ruta de base de datos para Render
 DATABASE_PATH = '/tmp/aberturas.db'
 
 def init_db():
@@ -45,12 +44,12 @@ def init_db():
         try:
             cursor.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", u)
         except sqlite3.IntegrityError:
-            pass
+            pass  # Ya existe el usuario
 
     conn.commit()
     conn.close()
 
-# Crear la base de datos al iniciar
+# Inicializar base de datos
 init_db()
 
 @app.route('/')
@@ -66,6 +65,7 @@ def do_login():
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     user = cursor.fetchone()
     conn.close()
+
     if user and check_password_hash(user[2], password):
         session['username'] = user[1]
         session['role'] = user[3]
@@ -77,21 +77,26 @@ def do_login():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
+
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM stock")
     datos = cursor.fetchall()
     conn.close()
+
     return render_template('dashboard.html', stock=datos, user=session['username'])
 
 @app.route('/agregar', methods=['GET', 'POST'])
 def agregar():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         tipo = request.form['tipo']
         medida = request.form['medida']
         material = request.form['material']
-        cantidad = request.form['cantidad']
-        usuario = session.get('username', 'desconocido')
+        cantidad = int(request.form['cantidad'])
+        usuario = session['username']
 
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
@@ -101,9 +106,10 @@ def agregar():
         ''', (tipo, medida, material, cantidad, usuario))
         conn.commit()
         conn.close()
+
         return redirect(url_for('dashboard'))
 
     return render_template('agregar.html')
 
-if __name__=='__main__':
+if _name_ == '_main_':
     app.run(debug=True)
