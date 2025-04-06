@@ -1,1 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Control de Stock{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Control de Stock de Aberturas</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('ubicaciones') }}">Ubicaciones</a></li>
+                <li><a href="{{ url_for('productos') }}">Productos</a></li>
+            </ul>
+        </nav>
+    </header>
 
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Control de Stock</p>
+    </footer>
+</body>
+</html>
