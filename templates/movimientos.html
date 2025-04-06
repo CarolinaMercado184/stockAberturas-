@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Movimientos{% endblock %}
+
+{% block content %}
+<h2>Movimientos</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Ubicación Origen</th>
+            <th>Ubicación Destino</th>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for movimiento in movimientos %}
+        <tr>
+            <td>{{ movimiento.id }}</td>
+            <td>{{ movimiento.producto.nombre }}</td>
+            <td>{{ movimiento.origen.nombre if movimiento.origen else "—" }}</td>
+            <td>{{ movimiento.destino.nombre if movimiento.destino else "—" }}</td>
+            <td>{{ movimiento.cantidad }}</td>
+            <td>{{ movimiento.fecha }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
