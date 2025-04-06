@@ -21,9 +21,11 @@ def escribir_datos(archivo, datos):
     with open(archivo, 'w', encoding='utf-8') as f:
         json.dump(datos, f, indent=2, ensure_ascii=False)
 
+
 @app.route('/')
 def login():
     return render_template('login.html')
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -32,56 +34,28 @@ def dashboard():
     vista = request.args.get('vista', 'general')
 
     stock_por_ubicacion = {}
-    for u in ubicaciones:
-        nombre = u['nombre']
-        stock_por_ubicacion[nombre] = [s for s in stock if s['ubicacion'] == nombre]
+    for item in stock:
+        key = (item['tipo'], item['medida'], item['color'])
+        for ubicacion, cantidad in item['stock'].items():
+            if ubicacion not in stock_por_ubicacion:
+                stock_por_ubicacion[ubicacion] = {}
+            if key not in stock_por_ubicacion[ubicacion]:
+                stock_por_ubicacion[ubicacion][key] = 0
+            stock_por_ubicacion[ubicacion][key] += cantidad
 
-    return render_template('dashboard.html', stock=stock, ubicaciones=ubicaciones, vista=vista, stock_por_ubicacion=stock_por_ubicacion)
+    if vista == 'general':
+        stock_general = {}
+        for item in stock:
+            key = (item['tipo'], item['medida'], item['color'])
+            stock_general[key] = stock_general.get(key, 0) + sum(item['stock'].values())
+        return render_template('dashboard.html', stock_general=stock_general, vista=vista)
+    else:
+        return render_template('dashboard.html', stock_por_ubicacion=stock_por_ubicacion, ubicaciones=ubicaciones, vista=vista)
 
-@app.route('/productos')
-def productos():
-    stock = leer_datos(STOCK_FILE)
-    return render_template('productos.html', stock=stock)
 
-@app.route('/agregar', methods=['GET', 'POST'])
-def agregar():
-    if request.method == 'POST':
-        stock = leer_datos(STOCK_FILE)
-        nuevo = {
-            'id': len(stock) + 1,
-            'tipo': request.form['tipo'],
-            'medida': request.form['medida'],
-            'color': request.form['color'],
-            'cantidad': int(request.form['cantidad']),
-            'ubicacion': request.form['ubicacion']
-        }
-        stock.append(nuevo)
-        escribir_datos(STOCK_FILE, stock)
-        return redirect(url_for('dashboard'))
-    ubicaciones = leer_datos(UBICACIONES_FILE)
-    return render_template('agregar.html', ubicaciones=ubicaciones)
-
-@app.route('/editar/<int:id>', methods=['GET', 'POST'])
-def editar(id):
-    stock = leer_datos(STOCK_FILE)
-    producto = next((p for p in stock if p['id'] == id), None)
-    if request.method == 'POST':
-        producto['tipo'] = request.form['tipo']
-        producto['medida'] = request.form['medida']
-        producto['color'] = request.form['color']
-        producto['cantidad'] = int(request.form['cantidad'])
-        producto['ubicacion'] = request.form['ubicacion']
-        escribir_datos(STOCK_FILE, stock)
-        return redirect(url_for('dashboard'))
-    ubicaciones = leer_datos(UBICACIONES_FILE)
-    return render_template('editar.html', producto=producto, ubicaciones=ubicaciones)
-
-@app.route('/nuevo_movimiento', methods=['GET', 'POST'])
+@app.route('/nuevo', methods=['GET', 'POST'])
 def nuevo_movimiento():
     if request.method == 'POST':
-        movimientos = leer_datos(MOVIMIENTOS_FILE)
-        stock = leer_datos(STOCK_FILE)
-
         tipo = request.form['tipo']
         medida = request.form['medida']
         color = request.form['color']
@@ -89,17 +63,37 @@ def nuevo_movimiento():
         destino = request.form['destino']
         cantidad = int(request.form['cantidad'])
 
-        # actualizar stock
+        stock = leer_datos(STOCK_FILE)
+        movimientos = leer_datos(MOVIMIENTOS_FILE)
+
+        encontrado = False
         for item in stock:
             if item['tipo'] == tipo and item['medida'] == medida and item['color'] == color:
-                if item['ubicacion'] == origen:
-                    item['cantidad'] -= cantidad
-                elif item['ubicacion'] == destino:
-                    item['cantidad'] += cantidad
+                if origen in item['stock']:
+                    item['stock'][origen] -= cantidad
+                else:
+                    item['stock'][origen] = 0
+                if destino in item['stock']:
+                    item['stock'][destino] += cantidad
+                else:
+                    item['stock'][destino] = cantidad
+                encontrado = True
+                break
+
+        if not encontrado:
+            item = {
+                'tipo': tipo,
+                'medida': medida,
+                'color': color,
+                'stock': {
+                    origen: 0,
+                    destino: cantidad
+                }
+            }
+            stock.append(item)
 
         escribir_datos(STOCK_FILE, stock)
 
-        # guardar movimiento
         movimiento = {
             'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'tipo': tipo,
@@ -117,3 +111,11 @@ def nuevo_movimiento():
     stock = leer_datos(STOCK_FILE)
     ubicaciones = leer_datos(UBICACIONES_FILE)
     tipos = list(set(item['tipo'] for item in stock))
+    medidas = list(set(item['medida'] for item in stock))
+    colores = list(set(item['color'] for item in stock))
+
+    return render_template('nuevo_movimiento.html', tipos=tipos, medidas=medidas, colores=colores, ubicaciones=ubicaciones)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
