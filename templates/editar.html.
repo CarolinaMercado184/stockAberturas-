@@ -1,1 +1,8 @@
-
+tu_proyecto/
+├── app.py
+├── templates/
+│   ├── dashboard.html
+│   ├── editar.html   ← acá va el nuevo
+│   └── ...otros.html
+├── static/
+│   └── ... (si usás estilos o scripts)
