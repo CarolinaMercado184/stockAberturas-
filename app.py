@@ -23,6 +23,9 @@ def init_db():
     ''')
     # Crear tabla de stock
     cursor.execute('''
+    @app.route('/')
+def home():
+    return render_template('index.html')
         CREATE TABLE IF NOT EXISTS stock (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             tipo TEXT,
