@@ -116,4 +116,4 @@ def nuevo_movimiento():
 
     stock = leer_datos(STOCK_FILE)
     ubicaciones = leer_datos(UBICACIONES_FILE)
-    tipos = list(s
+    tipos = list(set(item['tipo'] for item in stock))
