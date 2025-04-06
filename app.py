@@ -106,14 +106,20 @@ def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
+   conn = sqlite3.connect(DATABASE_PATH)
+cursor = conn.cursor()
+ubicacion_actual = request.form.get('ubicacion')
+
+if ubicacion_actual and ubicacion_actual != '':
+    cursor.execute("SELECT * FROM stock WHERE ubicacion = ?", (ubicacion_actual,))
+    datos = cursor.fetchall()
+    conn.close()
+    return render_template('dashboard.html', stock=datos, user=session['username'], ubicacion_actual=ubicacion_actual)
+else:
     cursor.execute("SELECT * FROM stock")
     datos = cursor.fetchall()
     conn.close()
-
     return render_template('dashboard.html', stock=datos, user=session['username'])
-
 @app.route('/agregar', methods=['GET', 'POST'])
 def agregar():
     if 'username' not in session:
