@@ -1,32 +1,36 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Stock de Aberturas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body class="container">
-    <h2 class="mt-4">Bienvenido, {{ user }} | <a href="/logout">Cerrar sesión</a></h2>
+<body class="p-4">
+    <h1>Stock de Aberturas</h1>
 
-    <h4 class="mt-4">Agregar Abertura</h4>
-    <form method="post" action="/agregar" class="row g-2 mb-4">
-        <div class="col"><input class="form-control" type="text" name="tipo" placeholder="Tipo" required></div>
-        <div class="col"><input class="form-control" type="text" name="medida" placeholder="Medida" required></div>
-        <div class="col"><input class="form-control" type="text" name="material" placeholder="Material" required></div>
-        <div class="col"><input class="form-control" type="number" name="cantidad" placeholder="Cantidad" required></div>
-       <div class="col">
-  <select class="form-control" name="ubicacion_id" required>
-    <option value="">Seleccionar ubicación</option>
-    <option value="1">BYG</option>
-    <option value="2">LA ECONÓMICA</option>
-    <option value="3">GALPÓN</option>
-  </select>
-</div> <div class="col"><button class="btn btn-success">Agregar</button></div>
+    <form method="post" action="/dashboard" class="mb-3">
+        <label for="ubicacion" class="form-label">Filtrar por ubicación:</label>
+        <select name="ubicacion" id="ubicacion" class="form-select" style="max-width: 300px;">
+            <option value="">Todas</option>
+            <option value="1">BYG</option>
+            <option value="2">LA ECONÓMICA</option>
+            <option value="3">GALPÓN</option>
+        </select>
+        <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
     </form>
 
-    <h4>Stock Actual</h4>
-    <thead><tr><th>ID</th><th>Tipo</th><th>Medida</th><th>Material</th><th>Cantidad</th><th>Usuario</th><th>Ubicación</th><th>Acciones</th></tr></thead>
-        <thead><tr><th>ID</th><th>Tipo</th><th>Medida</th><th>Material</th><th>Cantidad</th><th>Usuario</th><th>Acciones</th></tr></thead>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Medidas</th>
+                <th>Color</th>
+                <th>Marca</th>
+                <th>Cantidad</th>
+                <th>Ubicación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
         <tbody>
             {% for item in stock %}
             <tr>
@@ -36,18 +40,18 @@
                 <td>{{ item[3] }}</td>
                 <td>{{ item[4] }}</td>
                 <td>{{ item[5] }}</td>
-       <td>
-  {% if item[6] == 1 %}
-    BYG
-  {% elif item[6] == 2 %}
-    LA ECONÓMICA
-  {% elif item[6] == 3 %}
-    GALPÓN
-  {% else %}
-    -
-  {% endif %}
-</td>      
- <td>
+                <td>
+                    {% if item[6] == 1 %}
+                        BYG
+                    {% elif item[6] == 2 %}
+                        LA ECONÓMICA
+                    {% elif item[6] == 3 %}
+                        GALPÓN
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
                     <a class="btn btn-sm btn-success" href="/sumar/{{ item[0] }}">+</a>
                     <a class="btn btn-sm btn-danger" href="/restar/{{ item[0] }}">-</a>
                 </td>
