@@ -2,79 +2,40 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard de Stock</title>
+    <title>Stock de Aberturas</title>
 </head>
 <body>
-    <h1>Dashboard de Stock</h1>
+    <h1>Stock de Aberturas</h1>
 
-    <h2>Agregar nuevo stock</h2>
-    <form method="POST" action="/agregar_stock">
-        <input type="text" name="producto" placeholder="Producto" required>
-        <input type="text" name="tipo" placeholder="Tipo (Puerta, Ventana...)" required>
-        <input type="text" name="medida" placeholder="Medida" required>
-        <input type="text" name="color" placeholder="Color" required>
-        <input type="number" name="cantidad" placeholder="Cantidad" required>
-        <select name="ubicacion" required>
-            <option value="BYG">BYG</option>
-            <option value="LA ECONÓMICA">LA ECONÓMICA</option>
-            <option value="GALPÓN">GALPÓN</option>
-        </select>
-        <button type="submit">Agregar</button>
-    </form>
-    <hr>
-
-    <form method="get">
-        <label for="ubicacion">Filtrar por ubicación:</label>
-        <select name="ubicacion" id="ubicacion" onchange="this.form.submit()">
-            <option value="">Todas</option>
-            <option value="BYG" {% if ubicacion_seleccionada == 'BYG' %}selected{% endif %}>BYG</option>
-            <option value="LA ECONÓMICA" {% if ubicacion_seleccionada == 'LA ECONÓMICA' %}selected{% endif %}>LA ECONÓMICA</option>
-            <option value="GALPÓN" {% if ubicacion_seleccionada == 'GALPÓN' %}selected{% endif %}>GALPÓN</option>
-        </select>
-    </form>
-
-    {% if ubicacion_seleccionada %}
-        <h2>Stock en {{ ubicacion_seleccionada }}</h2>
-        <table border="1">
-            <tr>
-                <th>Producto</th>
-                <th>Tipo</th>
-                <th>Medida</th>
-                <th>Color</th>
-                <th>Cantidad</th>
-            </tr>
-            {% for item in stock_por_ubicacion %}
-                <tr>
-                    <td>{{ item['producto'] }}</td>
-                    <td>{{ item['tipo'] }}</td>
-                    <td>{{ item['medida'] }}</td>
-                    <td>{{ item['color'] }}</td>
-                    <td>{{ item['cantidad'] }}</td>
-                </tr>
+    <form method="get" action="/dashboard">
+        <label for="vista">Ver stock por:</label>
+        <select name="vista" id="vista" onchange="this.form.submit()">
+            <option value="general" {% if vista == 'general' %}selected{% endif %}>Todas las ubicaciones</option>
+            {% for ubicacion in ubicaciones %}
+                <option value="{{ ubicacion }}" {% if vista == ubicacion %}selected{% endif %}>{{ ubicacion }}</option>
             {% endfor %}
-        </table>
-    {% else %}
-        {% for ubicacion, items in stock_organizado.items() %}
-            <h2>Stock en {{ ubicacion }}</h2>
-            <table border="1">
-                <tr>
-                    <th>Producto</th>
-                    <th>Tipo</th>
-                    <th>Medida</th>
-                    <th>Color</th>
-                    <th>Cantidad</th>
-                </tr>
+        </select>
+    </form>
+
+    {% if vista == 'general' %}
+        <h2>Stock General</h2>
+        {% for ubicacion, items in stock_por_ubicacion.items() %}
+            <h3>{{ ubicacion }}</h3>
+            <ul>
                 {% for item in items %}
-                    <tr>
-                        <td>{{ item['producto'] }}</td>
-                        <td>{{ item['tipo'] }}</td>
-                        <td>{{ item['medida'] }}</td>
-                        <td>{{ item['color'] }}</td>
-                        <td>{{ item['cantidad'] }}</td>
-                    </tr>
+                    <li>{{ item.tipo }} - {{ item.medida }} - {{ item.color }}: {{ item.cantidad }}</li>
                 {% endfor %}
-            </table>
+            </ul>
         {% endfor %}
+    {% else %}
+        <h2>Stock en {{ vista }}</h2>
+        <ul>
+            {% for item in stock_por_ubicacion.get(vista, []) %}
+                <li>{{ item.tipo }} - {{ item.medida }} - {{ item.color }}: {{ item.cantidad }}</li>
+            {% endfor %}
+        </ul>
     {% endif %}
+
+    <a href="/nuevo">Registrar movimiento</a>
 </body>
 </html>
