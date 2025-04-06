@@ -17,14 +17,15 @@
         </select>
         <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
     </form>
-{% if ubicacion_seleccionada %}
-  <p><strong>Mostrando stock de:</strong>
-    {% if ubicacion_seleccionada == '1' %} BYG
-    {% elif ubicacion_seleccionada == '2' %} LA ECONÓMICA
-    {% elif ubicacion_seleccionada == '3' %} GALPÓN
+{% if ubicacion_actual %}
+<p><strong>Mostrando stock de:</strong>
+    {% if ubicacion_actual == '1' %} BYG
+    {% elif ubicacion_actual == '2' %} LA ECONÓMICA
+    {% elif ubicacion_actual == '3' %} GALPÓN
     {% else %} Todas las ubicaciones
     {% endif %}
-  </p>
+</p>
+{% endif %}
 {% endif %}
     <table class="table table-bordered table-striped">
         <thead>
