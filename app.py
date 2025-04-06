@@ -1,63 +1,119 @@
-from flask import Flask, render_template, request, redirect, url_for, session import sqlite3 from werkzeug.security import check_password_hash
+from flask import Flask, render_template, request, redirect, url_for
+import json
+import os
+from datetime import datetime
 
-app = Flask(name) app.secret_key = 'tu_clave_secreta'
+app = Flask(__name__)
 
-DATABASE_PATH = 'stock_aberturas.db'
+DATA_FOLDER = 'data'
+STOCK_FILE = os.path.join(DATA_FOLDER, 'stock.json')
+UBICACIONES_FILE = os.path.join(DATA_FOLDER, 'ubicaciones.json')
+MOVIMIENTOS_FILE = os.path.join(DATA_FOLDER, 'movimientos.json')
 
-Inicializar base de datos si es necesario
 
-def init_db(): conn = sqlite3.connect(DATABASE_PATH) cursor = conn.cursor() cursor.execute('''CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, password TEXT NOT NULL, role TEXT NOT NULL)''') cursor.execute('''CREATE TABLE IF NOT EXISTS stock ( id INTEGER PRIMARY KEY AUTOINCREMENT, producto TEXT NOT NULL, cantidad INTEGER NOT NULL, ubicacion TEXT NOT NULL)''') conn.commit() conn.close()
+def leer_datos(archivo):
+    if os.path.exists(archivo):
+        with open(archivo, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
 
-Iniciar base de datos
+def escribir_datos(archivo, datos):
+    with open(archivo, 'w', encoding='utf-8') as f:
+        json.dump(datos, f, indent=2, ensure_ascii=False)
 
-init_db()
+@app.route('/')
+def login():
+    return render_template('login.html')
 
-@app.route('/') def login(): return render_template('login.html')
+@app.route('/dashboard')
+def dashboard():
+    stock = leer_datos(STOCK_FILE)
+    ubicaciones = leer_datos(UBICACIONES_FILE)
+    vista = request.args.get('vista', 'general')
 
-@app.route('/login', methods=['POST']) def do_login(): username = request.form['username'] password = request.form['password'] conn = sqlite3.connect(DATABASE_PATH) cursor = conn.cursor() cursor.execute("SELECT * FROM users WHERE username = ?", (username,)) user = cursor.fetchone() conn.close()
+    stock_por_ubicacion = {}
+    for u in ubicaciones:
+        nombre = u['nombre']
+        stock_por_ubicacion[nombre] = [s for s in stock if s['ubicacion'] == nombre]
 
-if user and check_password_hash(user[2], password):
-    session['username'] = user[1]
-    session['role'] = user[3]
-    return redirect(url_for('dashboard'))
-else:
-    return render_template('login.html', error='Usuario o contraseña incorrectos')
+    return render_template('dashboard.html', stock=stock, ubicaciones=ubicaciones, vista=vista, stock_por_ubicacion=stock_por_ubicacion)
 
-@app.route('/dashboard', methods=['GET', 'POST']) def dashboard(): if 'username' not in session: return redirect(url_for('login'))
+@app.route('/productos')
+def productos():
+    stock = leer_datos(STOCK_FILE)
+    return render_template('productos.html', stock=stock)
 
-conn = sqlite3.connect(DATABASE_PATH)
-cursor = conn.cursor()
+@app.route('/agregar', methods=['GET', 'POST'])
+def agregar():
+    if request.method == 'POST':
+        stock = leer_datos(STOCK_FILE)
+        nuevo = {
+            'id': len(stock) + 1,
+            'tipo': request.form['tipo'],
+            'medida': request.form['medida'],
+            'color': request.form['color'],
+            'cantidad': int(request.form['cantidad']),
+            'ubicacion': request.form['ubicacion']
+        }
+        stock.append(nuevo)
+        escribir_datos(STOCK_FILE, stock)
+        return redirect(url_for('dashboard'))
+    ubicaciones = leer_datos(UBICACIONES_FILE)
+    return render_template('agregar.html', ubicaciones=ubicaciones)
 
-ubicacion_actual = request.form.get('ubicacion')
+@app.route('/editar/<int:id>', methods=['GET', 'POST'])
+def editar(id):
+    stock = leer_datos(STOCK_FILE)
+    producto = next((p for p in stock if p['id'] == id), None)
+    if request.method == 'POST':
+        producto['tipo'] = request.form['tipo']
+        producto['medida'] = request.form['medida']
+        producto['color'] = request.form['color']
+        producto['cantidad'] = int(request.form['cantidad'])
+        producto['ubicacion'] = request.form['ubicacion']
+        escribir_datos(STOCK_FILE, stock)
+        return redirect(url_for('dashboard'))
+    ubicaciones = leer_datos(UBICACIONES_FILE)
+    return render_template('editar.html', producto=producto, ubicaciones=ubicaciones)
 
-if ubicacion_actual and ubicacion_actual != '':
-    cursor.execute("SELECT * FROM stock WHERE ubicacion = ?", (ubicacion_actual,))
-else:
-    cursor.execute("SELECT * FROM stock")
+@app.route('/nuevo_movimiento', methods=['GET', 'POST'])
+def nuevo_movimiento():
+    if request.method == 'POST':
+        movimientos = leer_datos(MOVIMIENTOS_FILE)
+        stock = leer_datos(STOCK_FILE)
 
-datos = cursor.fetchall()
-conn.close()
+        tipo = request.form['tipo']
+        medida = request.form['medida']
+        color = request.form['color']
+        origen = request.form['origen']
+        destino = request.form['destino']
+        cantidad = int(request.form['cantidad'])
 
-return render_template('dashboard.html', stock=datos, user=session['username'], ubicacion_actual=ubicacion_actual)
+        # actualizar stock
+        for item in stock:
+            if item['tipo'] == tipo and item['medida'] == medida and item['color'] == color:
+                if item['ubicacion'] == origen:
+                    item['cantidad'] -= cantidad
+                elif item['ubicacion'] == destino:
+                    item['cantidad'] += cantidad
 
-@app.route('/agregar', methods=['GET', 'POST']) def agregar(): if 'username' not in session: return redirect(url_for('login'))
+        escribir_datos(STOCK_FILE, stock)
 
-if request.method == 'POST':
-    producto = request.form['producto']
-    cantidad = int(request.form['cantidad'])
-    ubicacion = request.form['ubicacion']
+        # guardar movimiento
+        movimiento = {
+            'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'tipo': tipo,
+            'medida': medida,
+            'color': color,
+            'origen': origen,
+            'destino': destino,
+            'cantidad': cantidad
+        }
+        movimientos.append(movimiento)
+        escribir_datos(MOVIMIENTOS_FILE, movimientos)
 
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO stock (producto, cantidad, ubicacion) VALUES (?, ?, ?)",
-                   (producto, cantidad, ubicacion))
-    conn.commit()
-    conn.close()
+        return redirect(url_for('dashboard'))
 
-    return redirect(url_for('dashboard'))
-
-return render_template('agregar.html')
-
-@app.route('/logout') def logout(): session.clear() return redirect(url_for('login'))
-
-if name == 'main': app.run(debug=True)
+    stock = leer_datos(STOCK_FILE)
+    ubicaciones = leer_datos(UBICACIONES_FILE)
+    tipos = list(s
