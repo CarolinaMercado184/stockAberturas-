@@ -7,7 +7,8 @@ app = Flask(__name__)
 app.secret_key = 'clave_secreta_para_sesiones'
 
 DATABASE_PATH = '/tmp/aberturas.db'
-
+if os.path.exists(DATABASE_PATH):
+    os.remove(DATABASE_PATH)
 def init_db():
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
