@@ -83,7 +83,9 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', stock=datos, user=session['username'])
 app = Flask(__name__)
-
+@app.route('/')
+def index():
+    return render_template('login.html')  # O el archivo que quieras mostrar primero
 @app.route('/agregar', methods=['GET', 'POST'])
 def agregar():
     if request.method == 'POST':
@@ -92,4 +94,4 @@ def agregar():
     return render_template('agregar.html')  # Asegúrate de que el archivo existe
 
 if __name__ =='_main_':
-    app.run(debug=True)
+app.run(debug=True)
