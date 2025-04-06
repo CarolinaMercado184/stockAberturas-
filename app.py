@@ -101,26 +101,25 @@ def dashboard():
     else:
         return render_template('login.html', error='Usuario o contraseña incorrectos')
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-   conn = sqlite3.connect(DATABASE_PATH)
-cursor = conn.cursor()
-ubicacion_actual = request.form.get('ubicacion')
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
 
-if ubicacion_actual and ubicacion_actual != '':
-    cursor.execute("SELECT * FROM stock WHERE ubicacion = ?", (ubicacion_actual,))
+    ubicacion_actual = request.form.get('ubicacion')
+
+    if ubicacion_actual and ubicacion_actual != '':
+        cursor.execute("SELECT * FROM stock WHERE ubicacion = ?", (ubicacion_actual,))
+    else:
+        cursor.execute("SELECT * FROM stock")
+
     datos = cursor.fetchall()
     conn.close()
+
     return render_template('dashboard.html', stock=datos, user=session['username'], ubicacion_actual=ubicacion_actual)
-else:
-    cursor.execute("SELECT * FROM stock")
-    datos = cursor.fetchall()
-    conn.close()
-    return render_template('dashboard.html', stock=datos, user=session['username'])
-@app.route('/agregar', methods=['GET', 'POST'])
 def agregar():
     if 'username' not in session:
         return redirect(url_for('login'))
