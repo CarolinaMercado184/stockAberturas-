@@ -110,13 +110,13 @@ def agregar():
         material = request.form['material']
         cantidad = int(request.form['cantidad'])
         usuario = session['username']
-
+ubicacion_id = int(request.form['ubicacion_id'])
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO stock (tipo, medida, material, cantidad, usuario)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (tipo, medida, material, cantidad, usuario))
+     cursor.execute('''
+    INSERT INTO stock (tipo, medida, material, cantidad, usuario, ubicacion_id)
+    VALUES (?, ?, ?, ?, ?, ?)
+''', (tipo, medida, material, cantidad, usuario, ubicacion_id))
         conn.commit()
         conn.close()
 
