@@ -1,32 +1,71 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Movimientos - Stock de Aberturas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <h1>Historial de Movimientos</h1>
 
-{% block title %}Movimientos{% endblock %}
+    {% if movimientos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Medida</th>
+                    <th>Color</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in movimientos %}
+                    <tr>
+                        <td>{{ m.fecha }}</td>
+                        <td>{{ m.tipo }}</td>
+                        <td>{{ m.medida }}</td>
+                        <td>{{ m.color }}</td>
+                        <td>{{ m.origen }}</td>
+                        <td>{{ m.destino }}</td>
+                        <td>{{ m.cantidad }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay movimientos registrados todavía.</p>
+    {% endif %}
 
-{% block content %}
-<h2>Movimientos</h2>
-
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Producto</th>
-            <th>Ubicación Origen</th>
-            <th>Ubicación Destino</th>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for movimiento in movimientos %}
-        <tr>
-            <td>{{ movimiento.id }}</td>
-            <td>{{ movimiento.producto.nombre }}</td>
-            <td>{{ movimiento.origen.nombre if movimiento.origen else "—" }}</td>
-            <td>{{ movimiento.destino.nombre if movimiento.destino else "—" }}</td>
-            <td>{{ movimiento.cantidad }}</td>
-            <td>{{ movimiento.fecha }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+    <a href="{{ url_for('dashboard') }}">Volver al dashboard</a>
+</body>
+</html>
