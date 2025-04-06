@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Movimiento{% endblock %}
+
+{% block content %}
+<h2>Registrar Nuevo Movimiento</h2>
+
+<form method="post">
+    <label for="producto_id">Producto:</label>
+    <select name="producto_id" required>
+        {% for producto in productos %}
+        <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="origen_id">Ubicación Origen:</label>
+    <select name="origen_id">
+        <option value="">—</option>
+        {% for ubicacion in ubicaciones %}
+        <option value="{{ ubicacion.id }}">{{ ubicacion.nombre }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="destino_id">Ubicación Destino:</label>
+    <select name="destino_id">
+        <option value="">—</option>
+        {% for ubicacion in ubicaciones %}
+        <option value="{{ ubicacion.id }}">{{ ubicacion.nombre }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="cantidad">Cantidad:</label>
+    <input type="number" name="cantidad" step="1" required><br>
+
+    <button type="submit">Registrar Movimiento</button>
+</form>
+{% endblock %}
