@@ -92,6 +92,5 @@ def agregar():
         # Aquí va la lógica para agregar una abertura al stock
         return redirect(url_for('index'))  # Cambia 'index' si usas otra ruta principal
     return render_template('agregar.html')  # Asegúrate de que el archivo existe
-
-if __name__ =='_main_':
-app.run(debug=True)
+if _name_ == '_main_':
+    app.run(debug=True)
