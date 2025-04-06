@@ -78,7 +78,22 @@ def do_login():
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     user = cursor.fetchone()
     conn.close()
+@app.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
 
+    ubicacion_seleccionada = request.form.get('ubicacion')
+
+    if ubicacion_seleccionada:
+        cursor.execute("SELECT * FROM stock WHERE ubicacion = ?", (ubicacion_seleccionada,))
+    else:
+        cursor.execute("SELECT * FROM stock")
+
+    stock = cursor.fetchall()
+    conn.close()
+
+    return render_template('dashboard.html', stock=stock)
     if user and check_password_hash(user[2], password):
         session['username'] = user[1]
         session['role'] = user[3]
