@@ -1,41 +1,46 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Stock de Aberturas</title>
+    <meta charset="UTF-8">
+    <title>Dashboard de Stock</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body class="container">
-    <h2 class="mt-4">Bienvenido, {{ user }} | <a href="/logout">Cerrar sesión</a></h2>
+<body class="p-4">
+    <h1 class="mb-4">Stock por ubicación</h1>
 
-    <h4 class="mt-4">Agregar Abertura</h4>
-    <form method="post" action="/agregar" class="row g-2 mb-4">
-        <div class="col"><input class="form-control" type="text" name="tipo" placeholder="Tipo" required></div>
-        <div class="col"><input class="form-control" type="text" name="medida" placeholder="Medida" required></div>
-        <div class="col"><input class="form-control" type="text" name="material" placeholder="Material" required></div>
-        <div class="col"><input class="form-control" type="number" name="cantidad" placeholder="Cantidad" required></div>
-        <div class="col"><button class="btn btn-success">Agregar</button></div>
-    </form>
+    <!-- Botones para filtrar -->
+    <div class="mb-4">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary me-2">Todas las ubicaciones</a>
+        <a href="{{ url_for('dashboard', ubicacion='BYG') }}" class="btn btn-outline-primary me-2">BYG</a>
+        <a href="{{ url_for('dashboard', ubicacion='LA ECONÓMICA') }}" class="btn btn-outline-primary me-2">LA ECONÓMICA</a>
+        <a href="{{ url_for('dashboard', ubicacion='GALPÓN') }}" class="btn btn-outline-primary">GALPÓN</a>
+    </div>
 
-    <h4>Stock Actual</h4>
-    <table class="table table-bordered">
-        <thead><tr><th>ID</th><th>Tipo</th><th>Medida</th><th>Material</th><th>Cantidad</th><th>Usuario</th><th>Acciones</th></tr></thead>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Ubicación</th>
+                <th>Cantidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
         <tbody>
             {% for item in stock %}
             <tr>
-                <td>{{ item[0] }}</td>
-                <td>{{ item[1] }}</td>
-                <td>{{ item[2] }}</td>
-                <td>{{ item[3] }}</td>
-                <td>{{ item[4] }}</td>
-                <td>{{ item[5] }}</td>
+                <td>{{ item['producto'] }}</td>
+                <td>{{ item['categoria'] }}</td>
+                <td>{{ item['ubicacion'] }}</td>
+                <td>{{ item['cantidad'] }}</td>
                 <td>
-                    <a class="btn btn-sm btn-success" href="/sumar/{{ item[0] }}">+</a>
-                    <a class="btn btn-sm btn-danger" href="/restar/{{ item[0] }}">-</a>
+                    <a href="{{ url_for('editar', id=item['id']) }}" class="btn btn-sm btn-warning">Editar</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <a href="{{ url_for('agregar') }}" class="btn btn-success mt-3">Agregar nuevo producto</a>
 </body>
 </html>
